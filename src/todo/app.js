@@ -40,6 +40,7 @@ jQuery(function ($) {
       this.drop = this.drop.bind(this);
 
       this.update = this.update.bind(this);
+      this.editKeyup = this.editKeyup.bind(this);
 
       $('#new-todo').on('keyup', this.create.bind(this));
       $('#toggle-all').on('change', this.toggleAll.bind(this));
@@ -175,16 +176,22 @@ jQuery(function ($) {
     edit: function (e) {
       this.disableDrag();
       var $input = $(e.target).closest('li').addClass('editing').find('.edit');
+      $input.data('original', $input.val());
       $input.val($input.val()).focus();
     },
     editKeyup: function (e) {
       if (e.which === ENTER_KEY) {
         e.target.blur();
+        return;
       }
 
       if (e.which === ESCAPE_KEY) {
         $(e.target).data('abort', true).blur();
+          return;
       }
+      var $el = $(e.target),
+          id = this.idFromEl($el);
+      this.model.editTodo(id, {title: $el.val()});
     },
     update: function (e) {
       var el = e.target;
@@ -196,13 +203,13 @@ jQuery(function ($) {
         return;
       }
 
+      var id = this.idFromEl(el);
+
       if ($el.data('abort')) {
         $el.data('abort', false);
-      } else {
-        var id = this.idFromEl(el);
-        this.model.editTodo(id, {title: val});
+        val = $el.data('original');
       }
-
+      this.model.editTodo(id, {title: val});
       this.render();
       this.enableDrag();
     },
