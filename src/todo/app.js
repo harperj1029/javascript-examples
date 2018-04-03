@@ -194,22 +194,21 @@ jQuery(function ($) {
       this.model.editTodo(id, {title: $el.val()});
     },
     update: function (e) {
-      var el = e.target;
-      var $el = $(el);
-      var val = $el.val().trim();
+      var el = e.target,
+        $el = $(el),
+        id = this.idFromEl(el),
+        val = $el.val().trim();
 
       if (!val) {
         this.destroy(e);
         return;
       }
 
-      var id = this.idFromEl(el);
-
       if ($el.data('abort')) {
         $el.data('abort', false);
         val = $el.data('original');
+        this.model.editTodo(id, {title: val});
       }
-      this.model.editTodo(id, {title: val});
       this.render();
       this.enableDrag();
     },
